@@ -1,3 +1,4 @@
+export const runtime = 'edge';
 import { NextResponse, type NextRequest } from 'next/server';
 import { createServerSupabase } from '@/lib/supabase/server';
 import { safeNextPath } from '@/lib/url';
