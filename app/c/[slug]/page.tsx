@@ -3,13 +3,14 @@ import { createClient } from '@supabase/supabase-js';
 import { notFound } from 'next/navigation';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 export default async function PublicProfilePage({ params }: PageProps) {
-  const { slug } = params;
+  // Next.js 15/16 mein params ek Promise hai, isliye await lagana zaroori hai
+  const { slug } = await params;
 
   // Initialize server Supabase client
   const supabase = createClient(
