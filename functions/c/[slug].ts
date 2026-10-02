@@ -6,7 +6,7 @@ export async function onRequestGet(context: {
     NEXT_PUBLIC_SUPABASE_URL?: string;
     NEXT_PUBLIC_SUPABASE_ANON_KEY?: string;
   };
-  waitUntil: (promise: Promise<any>) => void;
+  waitUntil: (promise: Promise<unknown>) => void;
 }) {
   const slug = context.params.slug as string;
 
@@ -34,12 +34,18 @@ export async function onRequestGet(context: {
       );
     }
 
-    // 2. Increment tap count in background
+    // 2. Increment tap count in background via a true Promise
     context.waitUntil(
-      supabase
-        .from('cards')
-        .update({ tap_count: (card.tap_count || 0) + 1 })
-        .eq('id', card.id)
+      (async () => {
+        try {
+          await supabase
+            .from('cards')
+            .update({ tap_count: (card.tap_count || 0) + 1 })
+            .eq('id', card.id);
+        } catch (e) {
+          console.error('Failed to increment tap count:', e);
+        }
+      })()
     );
 
     // 3. Redirect to destination URL
