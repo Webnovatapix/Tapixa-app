@@ -3,5 +3,9 @@
   "name": "tapixa-app",
   "pages_build_output_dir": ".vercel/output/static",
   "compatibility_date": "2026-03-01",
-  "compatibility_flags": ["nodejs_compat"]
+  "compatibility_flags": ["nodejs_compat"],
+  "vars": {
+    "NEXT_PUBLIC_SUPABASE_URL": "https://lygyoqdygyardxvuhifu.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_F9hdKS-Q5f-D0bkUpC7w2g_E00xhiQp"
+  }
 }
