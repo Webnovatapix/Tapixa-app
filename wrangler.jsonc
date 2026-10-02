@@ -1,0 +1,7 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "tapixa-app",
+  "pages_build_output_dir": ".vercel/output/static",
+  "compatibility_date": "2026-03-01",
+  "compatibility_flags": ["nodejs_compat"]
+}
