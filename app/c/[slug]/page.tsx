@@ -1,8 +1,8 @@
-export const runtime = 'edge'; 
+export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 import { createClient } from '@supabase/supabase-js';
-import { redirect, notFound } from 'next/navigation';
+import { redirect } from 'next/navigation';
 
 export default async function CardRedirectPage(props: {
   params: Promise<{ slug: string }>;
@@ -10,7 +10,11 @@ export default async function CardRedirectPage(props: {
   const { slug } = await props.params;
 
   if (!slug) {
-    notFound();
+    return (
+      <div style={{ padding: 20, fontFamily: 'sans-serif', background: '#fff', color: '#000' }}>
+        <h2>Slug missing in request</h2>
+      </div>
+    );
   }
 
   const supabaseUrl =
@@ -29,8 +33,31 @@ export default async function CardRedirectPage(props: {
     .eq('slug', slug)
     .maybeSingle();
 
-  if (error || !card || !card.destination_url) {
-    notFound();
+  if (error) {
+    return (
+      <div style={{ padding: 20, fontFamily: 'sans-serif', background: '#fff', color: '#000' }}>
+        <h2>Supabase Query Error:</h2>
+        <pre>{JSON.stringify(error, null, 2)}</pre>
+      </div>
+    );
+  }
+
+  if (!card) {
+    return (
+      <div style={{ padding: 20, fontFamily: 'sans-serif', background: '#fff', color: '#000' }}>
+        <h2>Card Not Found:</h2>
+        <p>Database me slug &quot;{slug}&quot; ka koi record nahi mila.</p>
+      </div>
+    );
+  }
+
+  if (!card.destination_url) {
+    return (
+      <div style={{ padding: 20, fontFamily: 'sans-serif', background: '#fff', color: '#000' }}>
+        <h2>Destination URL Missing:</h2>
+        <p>Card mil gaya par destination_url empty hai.</p>
+      </div>
+    );
   }
 
   // 2. Increment tap count in background
@@ -40,7 +67,6 @@ export default async function CardRedirectPage(props: {
     .eq('id', card.id)
     .then();
 
-  // 3. Format URL & Direct Redirect
   let finalUrl = card.destination_url.trim();
   if (!finalUrl.startsWith('http://') && !finalUrl.startsWith('https://')) {
     finalUrl = `https://${finalUrl}`;
