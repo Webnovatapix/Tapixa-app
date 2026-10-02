@@ -22,6 +22,9 @@ export default async function PublicProfilePage({ params }: PageProps) {
     .select('*')
     .eq('slug', slug)
     .single();
+  console.log("Supabase Debug - Slug:", slug);
+console.log("Supabase Debug - Data:", card);
+console.log("Supabase Debug - Error:", error);
 
   if (error || !card) {
     notFound();
