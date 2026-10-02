@@ -3,22 +3,20 @@ export const runtime = 'edge';
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  context: { params: Promise<{ slug: string }> }
+) {
   try {
-    // URL se seedhe slug nikal lo (e.g. /c/card1234 -> card1234)
-    const pathname = request.nextUrl.pathname;
-    const parts = pathname.split('/').filter(Boolean);
-    const slug = parts[parts.length - 1];
+    // Next.js 15/16 me params promise ko await karna zaroori hai
+    const { slug } = await context.params;
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-    if (!supabaseUrl || !supabaseKey) {
-      return new NextResponse(
-        'Supabase environment variables missing in Cloudflare.',
-        { status: 500 }
-      );
-    }
+    const supabaseUrl =
+      process.env.NEXT_PUBLIC_SUPABASE_URL ||
+      'https://lygyoqdygyardxvuhifu.supabase.co';
+    const supabaseKey =
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+      'sb_publishable_F9hdKS-Q5f-D0bkUpC7w2g_E00xhiQp';
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -42,11 +40,15 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Tap count badhao
-    await supabase
-      .from('cards')
-      .update({ tap_count: (card.tap_count || 0) + 1 })
-      .eq('id', card.id);
+    // Tap count background me badhao (fail hone par redirect mat roko)
+    try {
+      await supabase
+        .from('cards')
+        .update({ tap_count: (card.tap_count || 0) + 1 })
+        .eq('id', card.id);
+    } catch (e) {
+      console.error('Failed to update tap count:', e);
+    }
 
     // Agar destination URL hai toh redirect karo
     if (card.destination_url) {
@@ -54,7 +56,7 @@ export async function GET(request: NextRequest) {
       if (!finalUrl.startsWith('http://') && !finalUrl.startsWith('https://')) {
         finalUrl = `https://${finalUrl}`;
       }
-      return NextResponse.redirect(new URL(finalUrl));
+      return NextResponse.redirect(finalUrl, { status: 307 });
     }
 
     return new NextResponse(
