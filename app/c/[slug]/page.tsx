@@ -1,4 +1,4 @@
-export const runtime = 'edge'; 
+export const runtime = 'edge';
 import { createClient } from '@supabase/supabase-js';
 import { notFound } from 'next/navigation';
 
@@ -9,16 +9,14 @@ interface PageProps {
 }
 
 export default async function PublicProfilePage({ params }: PageProps) {
-  // Next.js 15/16 mein params ek Promise hai, isliye await lagana zaroori hai
   const { slug } = await params;
 
-  // Initialize server Supabase client
+  // Yahan direct wahi variable use karo jo Cloudflare mein dale hain
   const supabase = createClient(
-    process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SECRET_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  // Fetch card details by slug
   const { data: card, error } = await supabase
     .from('cards')
     .select('*')
@@ -29,7 +27,6 @@ export default async function PublicProfilePage({ params }: PageProps) {
     notFound();
   }
 
-  // Increment tap count asynchronously
   await supabase
     .from('cards')
     .update({ tap_count: (card.tap_count || 0) + 1 })
