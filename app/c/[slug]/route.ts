@@ -1,31 +1,31 @@
-export const runtime = 'edge'; 
+export const runtime = 'edge';
 
 import { createClient } from '@supabase/supabase-js';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ slug: string }> }
-) {
+export async function GET(request: NextRequest) {
   try {
-    const { slug } = await params;
+    // URL se seedhe slug nikal lo (e.g. /c/card1234 -> card1234)
+    const pathname = request.nextUrl.pathname;
+    const parts = pathname.split('/').filter(Boolean);
+    const slug = parts[parts.length - 1];
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
     if (!supabaseUrl || !supabaseKey) {
       return new NextResponse(
-        'Supabase environment variables missing in Cloudflare settings.',
+        'Supabase environment variables missing in Cloudflare.',
         { status: 500 }
       );
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Slug se card dhoondo
+    // Database se card dhundo
     const { data: card, error } = await supabase
       .from('cards')
-      .select('*')
+      .select('id, destination_url, tap_count')
       .eq('slug', slug)
       .maybeSingle();
 
@@ -37,28 +37,28 @@ export async function GET(
 
     if (!card) {
       return new NextResponse(
-        `Card not found: Slug "${slug}" database me maujood nahi hai.`,
+        `Card not found: Slug "${slug}" database me nahi mila.`,
         { status: 404 }
       );
     }
 
-    // Tap count update karo background me
+    // Tap count badhao
     await supabase
       .from('cards')
       .update({ tap_count: (card.tap_count || 0) + 1 })
       .eq('id', card.id);
 
-    // Destination URL check & redirect
+    // Agar destination URL hai toh redirect karo
     if (card.destination_url) {
       let finalUrl = card.destination_url.trim();
       if (!finalUrl.startsWith('http://') && !finalUrl.startsWith('https://')) {
         finalUrl = `https://${finalUrl}`;
       }
-      return NextResponse.redirect(finalUrl, 307);
+      return NextResponse.redirect(new URL(finalUrl));
     }
 
     return new NextResponse(
-      `Card "${slug}" active hai, lekin iska destination URL dashboard me blank hai.`,
+      `Card "${slug}" active hai, lekin iska destination URL blank hai.`,
       { status: 200 }
     );
   } catch (err: any) {
