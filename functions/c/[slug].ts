@@ -1,11 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 
-interface Env {
-  NEXT_PUBLIC_SUPABASE_URL?: string;
-  NEXT_PUBLIC_SUPABASE_ANON_KEY?: string;
-}
-
-export const onRequestGet: PagesFunction<Env> = async (context) => {
+export async function onRequestGet(context: {
+  params: { slug?: string };
+  env: {
+    NEXT_PUBLIC_SUPABASE_URL?: string;
+    NEXT_PUBLIC_SUPABASE_ANON_KEY?: string;
+  };
+  waitUntil: (promise: Promise<any>) => void;
+}) {
   const slug = context.params.slug as string;
 
   const supabaseUrl =
@@ -58,4 +60,4 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       status: 500,
     });
   }
-};
+}
