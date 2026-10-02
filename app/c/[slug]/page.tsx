@@ -17,12 +17,8 @@ export default async function CardRedirectPage(props: {
     );
   }
 
-  const supabaseUrl =
-    process.env.NEXT_PUBLIC_SUPABASE_URL ||
-    'https://lygyoqdygyardxvuhifu.supabase.co';
-  const supabaseKey =
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-    'sb_publishable_F9hdKS-Q5f-D0bkUpC7w2g_E00xhiQp';
+  const supabaseUrl = 'https://lygyoqdygyardxvuhifu.supabase.co';
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5Z3lvcWR5Z3lhcmR4dnVoaWZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA1MjgyNjksImV4cCI6MjEwNjEwNDI2OX0.R_HKh-w04sZl-KZPNUnN1aOq4YgoNBQVyNcbPP1uts4';
 
   const supabase = createClient(supabaseUrl, supabaseKey);
 
