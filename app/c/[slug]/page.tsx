@@ -10,15 +10,12 @@ export default async function CardRedirectPage(props: {
   const { slug } = await props.params;
 
   if (!slug) {
-    return (
-      <div style={{ padding: 20, fontFamily: 'sans-serif', background: '#fff', color: '#000' }}>
-        <h2>Slug missing in request</h2>
-      </div>
-    );
+    redirect('/');
   }
 
   const supabaseUrl = 'https://lygyoqdygyardxvuhifu.supabase.co';
-  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5Z3lvcWR5Z3lhcmR4dnVoaWZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA1MjgyNjksImV4cCI6MjEwNjEwNDI2OX0.R_HKh-w04sZl-KZPNUnN1aOq4YgoNBQVyNcbPP1uts4';
+  const supabaseKey =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5Z3lvcWR5Z3lhcmR4dnVoaWZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA1MjgyNjksImV4cCI6MjEwNjEwNDI2OX0.R_HKh-w04sZl-KZPNUnN1aOq4YgoNBQVyNcbPP1uts4';
 
   const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -38,22 +35,9 @@ export default async function CardRedirectPage(props: {
     );
   }
 
-  if (!card) {
-    return (
-      <div style={{ padding: 20, fontFamily: 'sans-serif', background: '#fff', color: '#000' }}>
-        <h2>Card Not Found:</h2>
-        <p>Database me slug &quot;{slug}&quot; ka koi record nahi mila.</p>
-      </div>
-    );
-  }
-
-  if (!card.destination_url) {
-    return (
-      <div style={{ padding: 20, fontFamily: 'sans-serif', background: '#fff', color: '#000' }}>
-        <h2>Destination URL Missing:</h2>
-        <p>Card mil gaya par destination_url empty hai.</p>
-      </div>
-    );
+  // Agar card database me nahi mila ya uska destination_url empty hai, activate page par bhejo
+  if (!card || !card.destination_url || card.destination_url.trim() === '') {
+    redirect(`/activate?card=${encodeURIComponent(slug)}`);
   }
 
   // 2. Increment tap count in background
