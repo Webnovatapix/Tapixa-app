@@ -4,7 +4,7 @@ import { FormEvent, ReactNode, Suspense, useEffect, useMemo, useRef, useState } 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { User } from '@supabase/supabase-js';
-import { Briefcase, Contact, Globe, Link2, Loader2, Nfc } from 'lucide-react';
+import { Briefcase, Contact, Eye, EyeOff, Globe, Link2, Loader2, Nfc } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 import { createClient } from '@/lib/supabase/client';
@@ -30,10 +30,11 @@ const PRESETS: Preset[] = [
 ];
 
 const INPUT_CLASS =
-  'w-full rounded-md border border-zinc-300 bg-white px-3 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-[var(--brand)] focus:outline-none focus:ring-2 focus:ring-[var(--brand)]';
+  'w-full rounded-md border border-zinc-300 bg-white px-3 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900';
 
+// High-contrast solid dark button for crystal clear visibility
 const BUTTON_CLASS =
-  'inline-flex w-full items-center justify-center gap-2 rounded-md bg-[var(--brand)] px-4 py-2.5 text-sm font-medium text-[var(--brand-fg)] hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand)] disabled:cursor-not-allowed disabled:opacity-50';
+  'inline-flex w-full items-center justify-center gap-2 rounded-md bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 disabled:cursor-not-allowed disabled:opacity-50';
 
 export default function ActivatePage() {
   return (
@@ -233,7 +234,7 @@ function ActivateFlow() {
           <Heading title="Already signed in" subtitle={`Signed in as ${user.email}`} />
           <Link
             href="/dashboard"
-            className="mt-4 inline-block w-full rounded-md bg-[var(--brand)] px-4 py-2.5 text-center text-sm font-medium text-[var(--brand-fg)]"
+            className="mt-4 inline-block w-full rounded-md bg-zinc-900 px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-zinc-800"
           >
             Go to Dashboard
           </Link>
@@ -304,7 +305,7 @@ function ActivateFlow() {
         </p>
         <Link
           href="/dashboard"
-          className="mt-5 inline-block text-sm font-medium text-[var(--brand)] underline underline-offset-4"
+          className="mt-5 inline-block text-sm font-semibold text-zinc-900 underline underline-offset-4 hover:text-zinc-700"
         >
           Open dashboard
         </Link>
@@ -354,7 +355,7 @@ function ActivateFlow() {
                   key={preset.id}
                   type="button"
                   onClick={() => applyPreset(preset)}
-                  className="inline-flex items-center gap-1.5 rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-800 hover:border-zinc-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand)]"
+                  className="inline-flex items-center gap-1.5 rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-800 hover:border-zinc-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900"
                 >
                   <Icon className="h-4 w-4" aria-hidden />
                   {preset.label}
@@ -419,11 +420,11 @@ function Frame({ slug, children }: { slug?: string | null; children: ReactNode }
       <div className="w-full max-w-md">
         {slug && (
           <div className="mb-6 inline-flex items-center gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
-            <Nfc className="h-5 w-5 text-[var(--brand)]" aria-hidden />
+            <Nfc className="h-5 w-5 text-zinc-900" aria-hidden />
             <span className="font-mono text-lg tracking-widest text-zinc-900">{slug}</span>
           </div>
         )}
-        <div className="rounded-xl border border-zinc-200 bg-white p-6 sm:p-8">{children}</div>
+        <div className="rounded-xl border border-zinc-200 bg-white p-6 sm:p-8 shadow-sm">{children}</div>
       </div>
     </main>
   );
@@ -484,6 +485,8 @@ function AuthForm({
   notice,
   onSubmit,
 }: AuthFormProps) {
+  const [showPassword, setShowPassword] = useState(false);
+
   return (
     <form onSubmit={onSubmit} className="mt-6 space-y-4">
       <div>
@@ -505,22 +508,37 @@ function AuthForm({
         <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-zinc-900">
           Password
         </label>
-        <input
-          id="password"
-          type="password"
-          autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
-          required
-          minLength={8}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className={INPUT_CLASS}
-        />
+        <div className="relative">
+          <input
+            id="password"
+            type={showPassword ? 'text' : 'password'}
+            autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+            required
+            minLength={8}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className={`${INPUT_CLASS} pr-10`}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 focus:outline-none"
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+          >
+            {showPassword ? (
+              <EyeOff className="h-4 w-4" aria-hidden />
+            ) : (
+              <Eye className="h-4 w-4" aria-hidden />
+            )}
+          </button>
+        </div>
         {mode === 'signup' && <p className="mt-1.5 text-sm text-zinc-500">At least 8 characters.</p>}
       </div>
 
       {error && <Alert tone="error">{error}</Alert>}
       {notice && <Alert tone="info">{notice}</Alert>}
 
+      {/* Solid Black Button */}
       <button type="submit" disabled={busy} className={BUTTON_CLASS}>
         {busy && <Loader2 className="h-4 w-4 animate-spin motion-reduce:animate-none" aria-hidden />}
         {mode === 'signup' ? 'Create account' : 'Sign in'}
@@ -531,7 +549,7 @@ function AuthForm({
         <button
           type="button"
           onClick={() => setMode(mode === 'signup' ? 'signin' : 'signup')}
-          className="font-medium text-[var(--brand)] underline underline-offset-4"
+          className="font-semibold text-zinc-900 underline underline-offset-4 hover:text-zinc-700"
         >
           {mode === 'signup' ? 'Sign in' : 'Create account'}
         </button>
