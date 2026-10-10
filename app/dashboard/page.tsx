@@ -183,10 +183,15 @@ export default function DashboardPage() {
                         NFC
                       </div>
                       <div>
-                        <h4 style={{ margin: 0, fontSize: '16px', fontWeight: '700', color: '#0f172a' }}>
-                          Card Slug: <code style={{ backgroundColor: '#e2e8f0', padding: '2px 6px', borderRadius: '4px' }}>{card.slug}</code>
-                        </h4>
-                        <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#64748b' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                          <h4 style={{ margin: 0, fontSize: '17px', fontWeight: '700', color: '#0f172a' }}>
+                            {card.title ? card.title : `Card: ${card.slug}`}
+                          </h4>
+                          <span style={{ fontSize: '12px', color: '#64748b', backgroundColor: '#e2e8f0', padding: '2px 8px', borderRadius: '4px', fontFamily: 'monospace', fontWeight: '600' }}>
+                            {card.slug}
+                          </span>
+                        </div>
+                        <p style={{ margin: '6px 0 0 0', fontSize: '13px', color: '#64748b' }}>
                           Taps: <strong style={{ color: '#2563eb' }}>{card.tap_count || 0}</strong>
                         </p>
                       </div>
